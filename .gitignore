@@ -1,0 +1,6 @@
+.env
+
+cogs/error/__pycache__
+cogs/mod/__pycache__
+cogs/roles/__pycache__
+utils/__pycache__
