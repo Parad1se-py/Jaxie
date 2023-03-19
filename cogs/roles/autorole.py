@@ -1,5 +1,5 @@
 import discord
-from discord import ApplicationContext, Forbidden, HTTPException, Member, Option, Role, SlashCommandGroup
+from discord import ApplicationContext, Forbidden, HTTPException, Interaction, Member, Option, Role, SlashCommandGroup
 from discord.ext import commands
 
 from utils import *
@@ -57,9 +57,9 @@ class AutoRole(commands.Cog):
             )
         )
 
-    rr = SlashCommandGroup('autorole', 'Slash group commands for autorole')
+    ar = SlashCommandGroup('autorole', 'Slash group commands for autorole')
 
-    @rr.command(
+    @ar.command(
         name='add',
         description='Add an autorole that is given to users upon joining automatically.',
         usage='/autorole add [role]'
@@ -67,15 +67,27 @@ class AutoRole(commands.Cog):
     @commands.has_permissions(
         manage_roles=True
     )
-    async def rr_add(self, ctx: ApplicationContext, role: Option(Role, required=True)):
+    @commands.bot_has_permissions(
+        manage_roles=True
+    )
+    async def ar_add(self, ctx: ApplicationContext, role: Option(Role, required=True)):
         await ctx.defer()
 
         if add_autorole(ctx.guild.id, role.id):
             await success_embed(
                 ctx, f"added {role.name} as autorole"
             )
+        
+    @ar_add.error
+    async def ar_add_error(interaction: Interaction, error):
+        if isinstance(error, commands.BotMissingPermissions):
+            await forbidden_error_embed(interaction, "manage_roles", "set autoroles")
+        elif isinstance(error, commands.MissingPermissions):
+            await missingperms_error_embed(interaction, "manage_roles", "set autoroles")
+        else:
+            raise error
 
-    @rr.command(
+    @ar.command(
         name='remove',
         description='Remove an autorole that is currently setup for the server.',
         usage='/autorole remove [role]'
@@ -83,7 +95,7 @@ class AutoRole(commands.Cog):
     @commands.has_permissions(
         manage_roles=True
     )
-    async def rr_remove(self, ctx: ApplicationContext, role: Option(Role, required=True)):
+    async def ar_remove(self, ctx: ApplicationContext, role: Option(Role, required=True)):
         await ctx.defer()
 
         if not remove_autorole(ctx.guild.id, role.id):
@@ -92,6 +104,13 @@ class AutoRole(commands.Cog):
                 You can add autoroles via `/autorole add [role]`.""")
         else:
             await success_embed(ctx, "removed autorole if it was set")
+
+    @ar_remove.error
+    async def ar_add_error(interaction: Interaction, error):
+        if isinstance(error, commands.MissingPermissions):
+            await missingperms_error_embed(interaction, "manage_roles", "remove autoroles")
+        else:
+            raise error
 
 
 def setup(bot:commands.Bot):
