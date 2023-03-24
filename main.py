@@ -9,22 +9,22 @@ bot = discord.Bot(intents=discord.Intents.all(), description="Jaxie is a mod-uti
 
 @bot.slash_command()
 async def load(ctx, name):
-    if ctx.author.id != 718712985371148309:
-        return
+#	if ctx.author.id != 718712985371148309:
+#		return
     bot.load_extension(f'cogs.{name}')
     await ctx.respond(f'Loaded {name}')
 
 @bot.slash_command()
 async def unloaded(ctx, name):
-    if ctx.author.id != 718712985371148309:
-        return
+#	if ctx.author.id != 718712985371148309:
+#		return
     bot.unload_extension(f'cogs.{name}')
     await ctx.respond(f'Unloaded {name}')
 
 @bot.slash_command()
 async def reload(ctx, name):
-	if ctx.author.id != 718712985371148309:
-		return
+#	if ctx.author.id != 718712985371148309:
+#		return
 	bot.unload_extension(f'cogs.{name}')
 	bot.load_extension(f'cogs.{name}')
 	await ctx.respond(f'Reloaded {name}')
@@ -40,4 +40,4 @@ async def on_ready():
 	print(f"Discord Version: {discord.__version__}")
 	await bot.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = f"/help | Watching over {len(bot.guilds)} servers!"))
 
-bot.run(os.getenv('BOT_TOKEN'))
+bot.run('MTAzMzcxNDA0MjM2NTMwMDczNg.GA57h_.cTjrYvdVgL6tGT5f5v1O9gyZmdF_R5eslXa43Q')

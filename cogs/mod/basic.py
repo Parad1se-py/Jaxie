@@ -36,8 +36,9 @@ class BasicMod(commands.Cog):
             return await permission_error(ctx, "kick")
         except discord.HTTPException:
             return await http_error(ctx)
-
-        return await success_embed(ctx, f"kicked {user.name}", f"Reason: {reason}")
+        
+        embed = discord.Embed(type='rich', color=discord.Color.nitro_pink(), title=f"Kicked {user}\nReason: `{reason}`")
+        return await ctx.respond(embed=embed)
 
     @commands.slash_command(
         name="ban",
@@ -60,7 +61,8 @@ class BasicMod(commands.Cog):
         except discord.HTTPException:
             return await http_error(ctx)
 
-        return await success_embed(ctx, f"banned {user.name}", f"Reason: {reason}")
+        embed = discord.Embed(type='rich', color=discord.Color.nitro_pink(), title=f"Banned {user}\nReason: `{reason}`")
+        return await ctx.respond(embed=embed)
 
     @commands.slash_command(
         name="lock",
@@ -91,7 +93,8 @@ class BasicMod(commands.Cog):
             overwrite.send_messages = True
             await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
-        return await success_embed(ctx, f"locked {channel.mention}", f"Duration: {duration}")
+        embed = discord.Embed(type='rich', color=discord.Color.nitro_pink(), title=f"Locked channel {channel.mention} for duration {duration}")
+        return await ctx.respond(embed=embed)
 
     @commands.slash_command(
         name="unlock",
@@ -112,8 +115,9 @@ class BasicMod(commands.Cog):
             return await permission_error(ctx, "unlock")
         except discord.HTTPException:
             return await http_error(ctx)
-
-        return await success_embed(ctx, f"unlocked {channel.mention}")
+        
+        embed = discord.Embed(type='rich', color=discord.Color.nitro_pink(), title=f"Unlocked channel {channel.mention}")
+        return await ctx.respond(embed=embed)
 
     @commands.slash_command(
         name="purge",
@@ -127,13 +131,14 @@ class BasicMod(commands.Cog):
         await ctx.defer()
 
         try:
-            await ctx.channel.purge(limit=limit)
+            await ctx.channel.purge(limit=limit+1)
         except discord.Forbidden:
             return await permission_error(ctx, "purge")
         except discord.HTTPException:
             return await http_error(ctx)
 
-        return await success_embed(ctx, f"purged {limit} messages from {ctx.channel.name}")
+        embed = discord.Embed(type='rich', color=discord.Color.green(), title=f"Deleted {limit} msgs from the channel")
+        return await ctx.respond(embed=embed)
 
 
 def setup(bot:commands.Bot):
