@@ -37,7 +37,7 @@ class BasicMod(commands.Cog):
         except discord.HTTPException:
             return await http_error(ctx)
 
-        return await success_embed(ctx, f"kicked {user.name}", f"Reason: {reason}")
+        return await success_embed(ctx, f"Kicked {user.name}", f"Reason: {reason}")
 
     @commands.slash_command(
         name="ban",
@@ -60,7 +60,7 @@ class BasicMod(commands.Cog):
         except discord.HTTPException:
             return await http_error(ctx)
 
-        return await success_embed(ctx, f"banned {user.name}", f"Reason: {reason}")
+        return await success_embed(ctx, f"Banned {user.name}", f"Reason: {reason}")
 
     @commands.slash_command(
         name="lock",
@@ -91,7 +91,7 @@ class BasicMod(commands.Cog):
             overwrite.send_messages = True
             await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
-        return await success_embed(ctx, f"locked {channel.mention}", f"Duration: {duration}")
+        return await success_embed(ctx, f"Locked {channel.mention}", f"Duration: {duration}")
 
     @commands.slash_command(
         name="unlock",
@@ -113,7 +113,7 @@ class BasicMod(commands.Cog):
         except discord.HTTPException:
             return await http_error(ctx)
 
-        return await success_embed(ctx, f"unlocked {channel.mention}")
+        return await success_embed(ctx, f"Unlocked {channel.mention}")
 
     @commands.slash_command(
         name="purge",
@@ -127,13 +127,13 @@ class BasicMod(commands.Cog):
         await ctx.defer()
 
         try:
-            await ctx.channel.purge(limit=limit)
+            await ctx.channel.purge(limit=limit+1)
         except discord.Forbidden:
             return await permission_error(ctx, "purge")
         except discord.HTTPException:
             return await http_error(ctx)
 
-        return await success_embed(ctx, f"purged {limit} messages from {ctx.channel.name}")
+        return await success_embed(ctx, f"Purged {limit} messages from {ctx.channel.name}")
 
 
 def setup(bot:commands.Bot):
