@@ -40,4 +40,4 @@ async def on_ready():
 	print(f"Discord Version: {discord.__version__}")
 	await bot.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = f"/help | Watching over {len(bot.guilds)} servers!"))
 
-bot.run('MTAzMzcxNDA0MjM2NTMwMDczNg.GA57h_.cTjrYvdVgL6tGT5f5v1O9gyZmdF_R5eslXa43Q')
+bot.run(os.getenv('TOKEN'))
