@@ -34,13 +34,13 @@ def remove_autorole(guild_id, role_id) -> bool:
     )
     return True
 
-def fetch_autoroles(guild_id) -> list:
+def fetch_autoroles(guild_id: int) -> list:
     # fetch the collection
     guild = collection.find_one({"_id": guild_id})
     # return false if collection doesn't exist else the roles.
     return guild["autoroles"] if bool(guild) else [False]
 
-def add_reactrole(guild_id, message_id, *args):
+def add_reactrole(guild_id: int, message_id: int, *args):
     reactroles = {{key: val} for key, val in args[0]}
 
     if not bool(collection.find_one({"_id": guild_id})):
@@ -57,6 +57,56 @@ def add_reactrole(guild_id, message_id, *args):
     )
     return True
 
-def fetch_reactrole(guild_id, message_id):
+def fetch_reactrole(guild_id: int, message_id: int = None) -> int:
     coll = collection.find_one({"_id": guild_id})
-    return coll['reactroles'][message_id] if bool(coll) else False
+
+    if not bool(coll):
+        return False
+    
+    if message_id is None:
+        return coll['reactroles']
+
+    return coll['reactroles'][message_id]
+
+def remove_reactrole(guild_id: int, message_id: int, emoji):
+    coll = collection.find_one({"_id": guild_id})
+
+    if not bool(coll):
+        return False
+
+    # delete reactrole from db
+    collection.update_one(
+        {"_id": guild_id},
+        {"$pull": {"reactroles": {message_id: {emoji.id: fetch_reactrole(guild_id, message_id)[emoji.id]}}}}
+    )
+
+    return True
+    # TODO: check if any reactroles are left. if not, remove collection.
+
+def remove_reactrole_set(guild_id: int, message_id: int):
+    coll = collection.find_one({"_id": guild_id})
+
+    if not bool(coll):
+        return False
+
+    # delete reactrole from db
+    collection.update_one(
+        {"_id": guild_id},
+        {"$pull": {"reactroles": message_id}}
+    )
+
+    return True
+    # TODO: check if any reactroles are left. if not, remove collection.
+
+def wipe_reactroles(guild_id: int):
+    coll = collection.find_one({"_id": guild_id})
+
+    if not bool(coll):
+        return False
+
+    # delete item from db
+    collection.delete_one(
+        {"_id": guild_id}
+    )
+
+    return True
