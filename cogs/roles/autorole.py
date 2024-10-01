@@ -16,19 +16,20 @@ class AutoRole(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: Member):
         autoroles = fetch_autoroles(member.guild.id)
-        if autoroles[0] == False:
+        if not autoroles[0]:
             return
 
         try:
-            for i in autoroles:
-                role = member.guild.get_role(i)
-                await member.add_roles(role, reason="Autoroles setup for the guild.")
+            guild = member.guild
+            roles = [guild.get_role(role_id) for role_id in autoroles]
+            await member.add_roles(*roles, reason="Autoroles setup for the guild.")
         except Forbidden:
             # TODO: alert that unable to give roles due to lack of permissions
             print("no perms to give roles")
         except HTTPException:
             # TODO: alert that adding roles failed
             print("error on discord's side trying to add roles.")
+
 
     @commands.slash_command(
         name='autoroles',
@@ -45,7 +46,7 @@ class AutoRole(commands.Cog):
         if autoroles[0] == False:
             return await ctx.respond(
                 """You currently don't have any autoroles setup for this server!
-                Use `/autorole add [role]` to add an autorole for this server."""
+                \nUse `/autorole add [role]` to add an autorole for this server."""
             )
 
         autoroles_str = "".join(f"<@&{i}>\n" for i in autoroles)
@@ -72,6 +73,9 @@ class AutoRole(commands.Cog):
     )
     async def ar_add(self, ctx: ApplicationContext, role: Option(Role, required=True)):
         await ctx.defer()
+
+        if role >= ctx.guild.me.top_role:
+            return await permission_error(ctx, "set autorole (role hierarchy issue)")
 
         if add_autorole(ctx.guild.id, role.id):
             await success_embed(
@@ -101,7 +105,7 @@ class AutoRole(commands.Cog):
         if not remove_autorole(ctx.guild.id, role.id):
             return await ctx.respond(
                 """You don't have an autoroles setup for this server!
-                You can add autoroles via `/autorole add [role]`.""")
+                \nYou can add autoroles via `/autorole add [role]`.""")
         else:
             await success_embed(ctx, "removed autorole if it was set")
 

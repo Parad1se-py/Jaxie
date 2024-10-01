@@ -63,6 +63,29 @@ class BasicMod(commands.Cog):
         return await success_embed(ctx, f"banned {user.name}", f"Reason: {reason}")
 
     @commands.slash_command(
+        name="unban",
+        description="Unban a user mentioned.",
+        usage="/unban [user] <reason>"
+    )
+    @commands.has_permissions(
+        ban_members=True
+    )
+    async def ban(self, ctx: ApplicationContext, user: Option(Member, required=True), reason: Option(str, required=False)):
+        await ctx.defer()
+
+        if user.top_role >= ctx.author.top_role or user.top_role >= self.bot.top_role:
+            return await hierarchy_error(ctx, "ban")
+
+        try:
+            await ctx.guild.ban(user, reason=reason)
+        except discord.Forbidden:
+            return await permission_error(ctx, "ban")
+        except discord.HTTPException:
+            return await http_error(ctx)
+
+        return await success_embed(ctx, f"banned {user.name}", f"Reason: {reason}")
+
+    @commands.slash_command(
         name="lock",
         description="Locks the specified channel for the [duration] if specified else forever.",
         usage="/lock [channel] <duration>"

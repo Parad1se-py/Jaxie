@@ -55,7 +55,7 @@ class ReactRole(commands.Cog):
     async def rr_add(self, ctx: ApplicationContext, msg_id: Option(str, required=True), emoji: Option(discord.Emoji, required=True), role: Option(discord.Role, required=True)):
         await ctx.defer()
 
-        if role >= self.bot.top_role:
+        if role >= ctx.guild.me.top_role:
             return await hierarchy_error_embed(ctx, role=role)
         
         msg = await ctx.fetch_message(msg_id)
